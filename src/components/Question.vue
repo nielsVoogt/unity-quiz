@@ -10,11 +10,13 @@
         {{ answer.answer }}
       </button>
     </div>
-    <div v-else>adsdsadas</div>
+    <div v-else>{{ result }}</div>
   </div>
 </template>
 
 <script>
+import ChannelDetails from "@/components/ChannelDetails";
+
 export default {
   name: "question",
   props: ["question"],
@@ -26,6 +28,7 @@ export default {
   methods: {
     checkAnswer(answer) {
       this.result = answer.correct;
+      this.$emit("question-answered", answer.correct);
     },
   },
 };

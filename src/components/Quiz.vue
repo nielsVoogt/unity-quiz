@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>isQuizMaster: {{ isQuizMaster }}</div>
+    <!-- <div>isQuizMaster: {{ isQuizMaster }}</div> -->
 
     <component
       v-bind:is="currentTabComponent"
@@ -14,10 +14,15 @@
     />
 
     <div v-if="currentQuestion !== false">
-      <Question :question="quiz[currentQuestion]" :key="currentQuestion" />
+      <QuizProgress :quiz="quiz" :current-question="currentQuestion" />
+      <Question
+        :question="quiz[currentQuestion]"
+        :key="currentQuestion"
+        :is-quiz-master="isQuizMaster"
+        @question-answered="updateScore"
+        v-if="currentQuestion !== quiz.length"
+      />
     </div>
-
-    <button @click="currentQuestion = currentQuestion + 1">up</button>
   </div>
 </template>
 
@@ -27,14 +32,22 @@ import ChooseTopics from "@/components/ChooseTopics";
 import ChoosePlayerName from "@/components/ChoosePlayerName";
 import WaitingRoom from "@/components/WaitingRoom";
 import Question from "@/components/Question";
+import QuizProgress from "@/components/QuizProgress";
 
 export default {
   name: "quiz",
-  components: { ChoosePlayerName, ChooseTopics, WaitingRoom, Question },
+  components: {
+    ChoosePlayerName,
+    ChooseTopics,
+    WaitingRoom,
+    Question,
+    QuizProgress,
+  },
   data() {
     return {
       currentTabComponent: ChoosePlayerName,
       playerId: null,
+      playerScore: 0,
       isQuizMaster: null,
       presenceId: null, // This holds the current presence-id
       players: [],
@@ -43,6 +56,19 @@ export default {
       currentQuestion: false,
       collectedAnswers: 0,
     };
+  },
+  watch: {
+    collectedAnswers(val) {
+      if (this.currentQuestion === this.quiz.length) {
+        // Retrieve all user scores and display score
+        alert("ho");
+      }
+
+      // Check if all players answered the question
+      if (val === this.players.length) {
+        this.triggerNextQuestion();
+      }
+    },
   },
   created() {
     this.fetchData();
@@ -114,8 +140,16 @@ export default {
         this.players = payload.data;
       });
 
+      channel.bind("client-player-anwsered-question", (payload) => {
+        this.collectedAnswers++;
+      });
+
       channel.bind("client-question-update", (payload) => {
         this.currentQuestion = payload.data;
+      });
+
+      channel.bind("client-next-question", (payload) => {
+        this.nextQuestion();
       });
 
       if (this.checkPresenceID()) {
@@ -140,11 +174,20 @@ export default {
     startQuiz() {
       this.currentQuestion = 0;
       let channel = ChannelDetails.subscribeToPusher();
-      console.log("client-question-update 2");
       channel.trigger("client-question-update", {
-        // quiz: this.quiz,
         data: this.currentQuestion,
       });
+    },
+
+    triggerNextQuestion() {
+      let channel = ChannelDetails.subscribeToPusher();
+      channel.trigger("client-next-question", {});
+      this.nextQuestion();
+    },
+
+    nextQuestion() {
+      this.currentQuestion++;
+      this.collectedAnswers = 0;
     },
 
     checkPresenceID() {
@@ -158,10 +201,19 @@ export default {
       return id;
     },
 
+    updateScore(answer) {
+      if (!this.isQuizMaster) {
+        let channel = ChannelDetails.subscribeToPusher();
+        channel.trigger("client-player-anwsered-question", {});
+      } else {
+        if (answer === true) this.playerScore++;
+        this.collectedAnswers++;
+      }
+    },
+
     setNewPlayer(name) {
       const player = {
         name: name,
-        score: 0,
         id: this.playerId,
       };
 
@@ -180,3 +232,9 @@ export default {
 };
 </script>
 
+<style>
+.active {
+  color: red;
+  display: block;
+}
+</style>
