@@ -1,32 +1,47 @@
 <template>
-  <transition name="fade">
-    <div class="home" v-if="!multiplePlayers">
-      <div class="inner">
-        <p>{{ shareUrl }}</p>
-      </div>
+  <div>
+    <div>isQuizMaster: {{ isQuizMaster }}</div>
+
+    <component
+      v-bind:is="currentTabComponent"
+      :is-quiz-master="isQuizMaster"
+      :players="players"
+      :url="url"
+      @player-added="setNewPlayer"
+      @quiz-built="setQuiz"
+      @start-quiz="startQuiz"
+      v-if="currentQuestion === false"
+    />
+
+    <div v-if="currentQuestion !== false">
+      <Question :question="quiz[currentQuestion]" :key="currentQuestion" />
     </div>
-    <div class="play" v-if="multiplePlayers">
-      <h1>Multiple players detected</h1>
-      <h2>{{ yolo }}</h2>
-      <button @click="doStuff">Do stuff</button>
-    </div>
-  </transition>
+
+    <button @click="currentQuestion = currentQuestion + 1">up</button>
+  </div>
 </template>
 
 <script>
 import ChannelDetails from "@/components/ChannelDetails";
+import ChooseTopics from "@/components/ChooseTopics";
+import ChoosePlayerName from "@/components/ChoosePlayerName";
+import WaitingRoom from "@/components/WaitingRoom";
+import Question from "@/components/Question";
 
 export default {
   name: "quiz",
+  components: { ChoosePlayerName, ChooseTopics, WaitingRoom, Question },
   data() {
     return {
+      currentTabComponent: ChoosePlayerName,
+      playerId: null,
+      isQuizMaster: null,
       presenceId: null, // This holds the current presence-id
-      multiplePlayers: false, // This checks if there's a second player, it becomes true when players = 2
-      playerData: null,
-      userId: null, // This holds the userId for the current player
+      players: [],
       url: false, // This holds the current URL of the game
-      shareUrl: null,
-      yolo: "Yoloooooo",
+      quiz: [],
+      currentQuestion: false,
+      collectedAnswers: 0,
     };
   },
   created() {
@@ -50,21 +65,27 @@ export default {
       // The channel variable is set to to the subscribeToPusher function in ChannelDetails.
       let channel = ChannelDetails.subscribeToPusher();
 
+      // ----------------------------------------------------------------------------------------- //
+      // ------------------------------------- PUSHER EVENTS ------------------------------------- //
+      // ----------------------------------------------------------------------------------------- //
+
       // The pusher:member_added event is triggered when a user joins a channel. We increase the number of players by one and also set the secondplayer boolean to true.
       channel.bind("pusher:member_added", (members) => {
         console.log("member_added", members);
-        this.multiplePlayers = true;
+        channel.trigger("client-send-quiz", { data: this.quiz });
       });
 
       // Once a subscription has been made to a presence channel, an event is triggered with a members iterator.
       channel.bind("pusher:subscription_succeeded", (members) => {
-        console.log("subscription_succeeded", members);
+        console.log("subscription_succeeded", members.me.id);
+
+        this.playerId = members.me.id;
+
         if (members.count !== 1) {
           console.log("Found more players");
-          this.multiplePlayers = true;
+        } else {
+          this.isQuizMaster = true;
         }
-
-        this.playerData = members;
       });
 
       // The pusher:member_removed is triggered when a user leaves a channel. We decrease the number of players by one and also set the secondplayer boolean to false.
@@ -72,13 +93,29 @@ export default {
         console.log("member_removed", member);
 
         if (member.count === 1) {
-          this.multiplePlayers = false;
+          console.log("Only one left");
         }
       });
 
-      // This function receives new data from Pusher and updates the exisiting scores. This is what updates each player's score in realtime.
-      channel.bind("client-send", (data) => {
-        console.log("client-send", data);
+      // ----------------------------------------------------------------------------------------- //
+      // ------------------------------------- CUSTOM EVENTS ------------------------------------- //
+      // ----------------------------------------------------------------------------------------- //
+
+      channel.bind("client-send-quiz", (payload) => {
+        this.quiz = payload.data;
+      });
+
+      channel.bind("client-add-player", (payload) => {
+        this.players.push(payload.data);
+        this.updatePlayers();
+      });
+
+      channel.bind("client-update-players", (payload) => {
+        this.players = payload.data;
+      });
+
+      channel.bind("client-question-update", (payload) => {
+        this.currentQuestion = payload.data;
       });
 
       if (this.checkPresenceID()) {
@@ -86,8 +123,28 @@ export default {
       }
     },
 
+    updatePlayers() {
+      let channel = ChannelDetails.subscribeToPusher();
+      channel.trigger("client-update-players", { data: this.players });
+    },
+
     getUniqueId() {
       return "id=" + Math.random().toString(36).substr(2, 8);
+    },
+
+    setQuiz(quiz) {
+      this.quiz = quiz;
+      this.currentTabComponent = WaitingRoom;
+    },
+
+    startQuiz() {
+      this.currentQuestion = 0;
+      let channel = ChannelDetails.subscribeToPusher();
+      console.log("client-question-update 2");
+      channel.trigger("client-question-update", {
+        // quiz: this.quiz,
+        data: this.currentQuestion,
+      });
     },
 
     checkPresenceID() {
@@ -101,10 +158,23 @@ export default {
       return id;
     },
 
-    doStuff() {
-      this.yolo = "lalala";
-      let channel = ChannelDetails.subscribeToPusher();
-      channel.trigger("client-send", { data: this.yolo });
+    setNewPlayer(name) {
+      const player = {
+        name: name,
+        score: 0,
+        id: this.playerId,
+      };
+
+      if (this.isQuizMaster) {
+        this.players.push(player);
+        this.currentTabComponent = ChooseTopics;
+      } else {
+        let channel = ChannelDetails.subscribeToPusher();
+        channel.trigger("client-add-player", {
+          data: player,
+        });
+        this.currentTabComponent = WaitingRoom;
+      }
     },
   },
 };

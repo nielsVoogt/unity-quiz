@@ -8,8 +8,8 @@ const pusher = new Pusher(process.env.VUE_APP_PUSHER_KEY, {
 });
 
 export default {
+  // This function checks the address bar of the browser for params
   getPresenceID() {
-    // This function checks the address bar of the browser for params
     let getQueryString = (field, url) => {
       let href = url ? url : window.location.href;
       let reg = new RegExp("[?&]" + field + "=([^&#]*)", "i");
@@ -21,6 +21,7 @@ export default {
     id = "presence-" + id;
     return id;
   },
+
   subscribeToPusher() {
     let presenceid = this.getPresenceID();
     let channel = pusher.subscribe(presenceid);
