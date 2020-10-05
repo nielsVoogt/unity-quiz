@@ -20,6 +20,7 @@
           :question="quiz[currentQuestion]"
           :key="currentQuestion"
           :is-quiz-master="isQuizMaster"
+          :countdown="countdown"
           @question-answered="updateScore"
         />
       </div>
@@ -35,6 +36,8 @@ import ChoosePlayerName from "@/components/ChoosePlayerName";
 import WaitingRoom from "@/components/WaitingRoom";
 import Question from "@/components/Question";
 import QuizProgress from "@/components/QuizProgress";
+
+let channel = ChannelDetails.subscribeToPusher();
 
 export default {
   name: "quiz",
@@ -57,6 +60,7 @@ export default {
       quiz: [],
       currentQuestion: false,
       collectedAnswers: 0,
+      countdown: false,
     };
   },
   watch: {
@@ -86,19 +90,11 @@ export default {
 
       if (!this.checkPresenceID()) {
         var separator = window.location.href.indexOf("?") === -1 ? "?" : "&";
-        window.location.href =
-          window.location.href + separator + this.presenceId;
+        window.location.href = window.location.href + separator + this.presenceId;
       }
 
       // Sets the data instance url variable to the current URL.
       this.url = window.location.href;
-
-      // The channel variable is set to to the subscribeToPusher function in ChannelDetails.
-      let channel = ChannelDetails.subscribeToPusher();
-
-      // ----------------------------------------------------------------------------------------- //
-      // ------------------------------------- PUSHER EVENTS ------------------------------------- //
-      // ----------------------------------------------------------------------------------------- //
 
       // The pusher:member_added event is triggered when a user joins a channel.
       channel.bind("pusher:member_added", (members) => {
@@ -127,10 +123,6 @@ export default {
           console.log("Only one left");
         }
       });
-
-      // ----------------------------------------------------------------------------------------- //
-      // ------------------------------------- CUSTOM EVENTS ------------------------------------- //
-      // ----------------------------------------------------------------------------------------- //
 
       channel.bind("client-send-quiz", (payload) => {
         this.quiz = payload.data;
@@ -163,7 +155,12 @@ export default {
     },
 
     getUniqueId() {
-      return "id=" + Math.random().toString(36).substr(2, 8);
+      return (
+        "id=" +
+        Math.random()
+          .toString(36)
+          .substr(2, 8)
+      );
     },
 
     setQuiz(quiz) {
@@ -173,21 +170,24 @@ export default {
 
     startQuiz() {
       this.currentQuestion = 0;
-      let channel = ChannelDetails.subscribeToPusher();
       channel.trigger("client-question-update", {
         data: this.currentQuestion,
       });
     },
 
     triggerNextQuestion() {
-      let channel = ChannelDetails.subscribeToPusher();
       channel.trigger("client-next-question", {});
       this.nextQuestion();
     },
 
     nextQuestion() {
-      this.currentQuestion++;
-      this.collectedAnswers = 0;
+      this.countdown = true;
+      let self = this;
+      setTimeout(function() {
+        self.currentQuestion++;
+        self.collectedAnswers = 0;
+        self.countdown = false;
+      }, 3000);
     },
 
     checkPresenceID() {
@@ -203,7 +203,6 @@ export default {
 
     updateScore(answer) {
       if (!this.isQuizMaster) {
-        let channel = ChannelDetails.subscribeToPusher();
         channel.trigger("client-player-anwsered-question", {});
       } else {
         if (answer === true) {
@@ -223,7 +222,6 @@ export default {
         this.players.push(player);
         this.currentTabComponent = ChooseTopics;
       } else {
-        let channel = ChannelDetails.subscribeToPusher();
         channel.trigger("client-add-player", {
           data: player,
         });
