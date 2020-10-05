@@ -14,14 +14,16 @@
     />
 
     <div v-if="currentQuestion !== false">
-      <QuizProgress :quiz="quiz" :current-question="currentQuestion" />
-      <Question
-        :question="quiz[currentQuestion]"
-        :key="currentQuestion"
-        :is-quiz-master="isQuizMaster"
-        @question-answered="updateScore"
-        v-if="currentQuestion !== quiz.length"
-      />
+      <div v-if="currentQuestion !== quiz.length">
+        <QuizProgress :quiz="quiz" :current-question="currentQuestion" />
+        <Question
+          :question="quiz[currentQuestion]"
+          :key="currentQuestion"
+          :is-quiz-master="isQuizMaster"
+          @question-answered="updateScore"
+        />
+      </div>
+      <div v-else>Hello</div>
     </div>
   </div>
 </template>
@@ -78,7 +80,10 @@ export default {
       // Sets the data instance presenceId variable to the result of the getUniqueId function
       this.presenceId = this.getUniqueId();
 
-      // This checks if there's no presence ID in the URL via the checkPresenceID function and appends the presenceId to the current URL so that we can have the URL end with a parameter like this https://hamilton-lyrics.firebaseapp.com/#/?id=agbew0gz
+      // This checks if there's no presence ID in the URL via the checkPresenceID function and
+      // appends the presenceId to the current URL so that we can have the URL end with a parameter
+      // like this https://hamilton-lyrics.firebaseapp.com/#/?id=agbew0gz
+
       if (!this.checkPresenceID()) {
         var separator = window.location.href.indexOf("?") === -1 ? "?" : "&";
         window.location.href =
@@ -95,7 +100,7 @@ export default {
       // ------------------------------------- PUSHER EVENTS ------------------------------------- //
       // ----------------------------------------------------------------------------------------- //
 
-      // The pusher:member_added event is triggered when a user joins a channel. We increase the number of players by one and also set the secondplayer boolean to true.
+      // The pusher:member_added event is triggered when a user joins a channel.
       channel.bind("pusher:member_added", (members) => {
         console.log("member_added", members);
         channel.trigger("client-send-quiz", { data: this.quiz });
@@ -133,7 +138,7 @@ export default {
 
       channel.bind("client-add-player", (payload) => {
         this.players.push(payload.data);
-        this.updatePlayers();
+        channel.trigger("client-update-players", { data: this.players });
       });
 
       channel.bind("client-update-players", (payload) => {
@@ -155,11 +160,6 @@ export default {
       if (this.checkPresenceID()) {
         this.shareUrl = this.url;
       }
-    },
-
-    updatePlayers() {
-      let channel = ChannelDetails.subscribeToPusher();
-      channel.trigger("client-update-players", { data: this.players });
     },
 
     getUniqueId() {
@@ -206,7 +206,9 @@ export default {
         let channel = ChannelDetails.subscribeToPusher();
         channel.trigger("client-player-anwsered-question", {});
       } else {
-        if (answer === true) this.playerScore++;
+        if (answer === true) {
+          this.playerScore++;
+        }
         this.collectedAnswers++;
       }
     },
