@@ -1,20 +1,19 @@
-import Vue from "vue";
-import Router from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
-Vue.use(Router);
+const routes = [
+  {
+    path: "/",
+    name: "Home",
+    component: () => import("@/components/Home"),
+  },
+  {
+    path: "/quiz",
+    name: "Start",
+    component: () => import("@/components/Start"),
+  },
+];
 
-export default new Router({
-  mode: "history",
-  routes: [
-    {
-      path: "/",
-      name: "Home",
-      component: () => import("@/components/Home"),
-    },
-    {
-      path: "/quiz",
-      name: "Start",
-      component: () => import("@/components/Start"),
-    },
-  ],
+export default createRouter({
+  history: createWebHistory(),
+  routes,
 });
