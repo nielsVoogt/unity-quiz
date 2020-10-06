@@ -2,18 +2,20 @@
   <div>
     <!-- <div>isQuizMaster: {{ isQuizMaster }}</div> -->
 
-    <component
-      v-bind:is="currentTabComponent"
+    <ChoosePlayerName
+      @player-added="setNewPlayer"
+      v-if="playerState === 'ADD_PLAYER'"
+    />
+    <ChooseTopics @quiz-built="setQuiz" v-if="playerState === 'BUILD_QUIZ'" />
+    <WaitingRoom
+      @start-quiz="startQuiz"
+      v-if="playerState === 'WAITING'"
       :is-quiz-master="isQuizMaster"
       :players="players"
       :url="url"
-      @player-added="setNewPlayer"
-      @quiz-built="setQuiz"
-      @start-quiz="startQuiz"
-      v-if="currentQuestion === false"
     />
 
-    <div v-if="currentQuestion !== false">
+    <div v-if="playerState === 'PLAYING'">
       <div v-if="currentQuestion !== quiz.length">
         <QuizProgress :quiz="quiz" :current-question="currentQuestion" />
         <Question
@@ -40,7 +42,7 @@ import QuizProgress from "@/components/QuizProgress";
 let channel = ChannelDetails.subscribeToPusher();
 
 export default {
-  name: "quiz",
+  name: "start",
   components: {
     ChoosePlayerName,
     ChooseTopics,
@@ -50,12 +52,12 @@ export default {
   },
   data() {
     return {
-      currentTabComponent: ChoosePlayerName,
       playerId: null,
       playerScore: 0,
       isQuizMaster: null,
       presenceId: null, // This holds the current presence-id
       players: [],
+      playerState: "ADD_PLAYER",
       url: false, // This holds the current URL of the game
       quiz: [],
       currentQuestion: false,
@@ -90,7 +92,8 @@ export default {
 
       if (!this.checkPresenceID()) {
         var separator = window.location.href.indexOf("?") === -1 ? "?" : "&";
-        window.location.href = window.location.href + separator + this.presenceId;
+        window.location.href =
+          window.location.href + separator + this.presenceId;
       }
 
       // Sets the data instance url variable to the current URL.
@@ -106,7 +109,7 @@ export default {
       channel.bind("pusher:subscription_succeeded", (members) => {
         console.log("subscription_succeeded", members.me.id);
 
-        this.playerId = members.me.id;
+        // this.playerId = members.me.id;
 
         if (members.count !== 1) {
           console.log("Found more players");
@@ -137,15 +140,16 @@ export default {
         this.players = payload.data;
       });
 
-      channel.bind("client-player-anwsered-question", (payload) => {
+      channel.bind("client-player-anwsered-question", () => {
         this.collectedAnswers++;
       });
 
       channel.bind("client-question-update", (payload) => {
+        this.playerState = "PLAYING";
         this.currentQuestion = payload.data;
       });
 
-      channel.bind("client-next-question", (payload) => {
+      channel.bind("client-next-question", () => {
         this.nextQuestion();
       });
 
@@ -155,20 +159,16 @@ export default {
     },
 
     getUniqueId() {
-      return (
-        "id=" +
-        Math.random()
-          .toString(36)
-          .substr(2, 8)
-      );
+      return "id=" + Math.random().toString(36).substr(2, 8);
     },
 
     setQuiz(quiz) {
       this.quiz = quiz;
-      this.currentTabComponent = WaitingRoom;
+      this.playerState = "WAITING";
     },
 
     startQuiz() {
+      this.playerState = "PLAYING";
       this.currentQuestion = 0;
       channel.trigger("client-question-update", {
         data: this.currentQuestion,
@@ -183,7 +183,7 @@ export default {
     nextQuestion() {
       this.countdown = true;
       let self = this;
-      setTimeout(function() {
+      setTimeout(function () {
         self.currentQuestion++;
         self.collectedAnswers = 0;
         self.countdown = false;
@@ -213,19 +213,19 @@ export default {
     },
 
     setNewPlayer(name) {
-      const player = {
-        name: name,
-        id: this.playerId,
-      };
+      // const player = {
+      //   name: name,
+      //   // id: this.playerId,
+      // };
 
       if (this.isQuizMaster) {
-        this.players.push(player);
-        this.currentTabComponent = ChooseTopics;
+        this.players.push(name);
+        this.playerState = "BUILD_QUIZ";
       } else {
         channel.trigger("client-add-player", {
-          data: player,
+          data: name,
         });
-        this.currentTabComponent = WaitingRoom;
+        this.playerState = "WAITING";
       }
     },
   },
