@@ -1,13 +1,7 @@
 <template>
   <div>
-    <ChoosePlayerName
-      @player-added="setNewPlayer"
-      v-if="playerState === 'ADD_PLAYER'"
-    />
-    <ChooseTopics
-      @quiz-built="setNewQuiz"
-      v-if="playerState === 'BUILD_QUIZ'"
-    />
+    <ChoosePlayerName @player-added="setNewPlayer" v-if="playerState === 'ADD_PLAYER'" />
+    <ChooseTopics @quiz-built="setNewQuiz" v-if="playerState === 'BUILD_QUIZ'" />
     <WaitingRoom
       @start-quiz="startQuiz"
       v-if="playerState === 'WAITING'"
@@ -76,8 +70,7 @@ export default {
       // appends the presenceId to the current URL so that we can have the URL end with a parameter
       if (!this.checkPresenceID()) {
         var separator = window.location.href.indexOf("?") === -1 ? "?" : "&";
-        window.location.href =
-          window.location.href + separator + this.presenceId;
+        window.location.href = window.location.href + separator + this.presenceId;
       }
 
       // Sets the data instance url variable to the current URL.
@@ -85,15 +78,18 @@ export default {
 
       // The pusher:member_added event is triggered when a user joins a channel.
       channel.bind("pusher:member_added", (members) => {
+        console.log("member added");
         channel.trigger("client-send-quiz", { data: this.quiz });
       });
 
       // Once a subscription has been made to a presence channel, an event is triggered with a members iterator.
       channel.bind("pusher:subscription_succeeded", (members) => {
+        console.log("subscription succeeded");
         if (members.count === 1) this.setIsQuizMaster(true);
       });
 
       channel.bind("client-send-quiz", (payload) => {
+        console.log("send-quiz");
         this.setQuiz(payload.data);
       });
 
@@ -140,7 +136,7 @@ export default {
     nextQuestion() {
       this.setCountdown(true);
       let self = this;
-      setTimeout(function () {
+      setTimeout(function() {
         self.incrementCurrentQuestion();
         self.resetCollectedAnswers();
         self.setCountdown(false);
@@ -169,8 +165,17 @@ export default {
     },
 
     getUniqueId() {
-      return "id=" + Math.random().toString(36).substr(2, 8);
+      return (
+        "id=" +
+        Math.random()
+          .toString(36)
+          .substr(2, 8)
+      );
     },
+  },
+  mounted() {
+    const selectedLocale = sessionStorage.getItem("locale");
+    if (selectedLocale) this.$i18n.locale = selectedLocale;
   },
 };
 </script>
