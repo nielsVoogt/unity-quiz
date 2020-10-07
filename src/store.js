@@ -2,6 +2,7 @@ import Vue from "vue";
 
 // prettier-ignore
 const state = Vue.observable({
+  quizLocale: "null",
   quiz: [],
   currentQuestion: null,
   isQuizMaster: false,
@@ -11,6 +12,7 @@ const state = Vue.observable({
 });
 
 export const getters = {
+  quizLocale: () => state.quizLocale,
   quiz: () => state.quiz,
   currentQuestion: () => state.currentQuestion,
   isQuizMaster: () => state.isQuizMaster,
@@ -20,6 +22,7 @@ export const getters = {
 };
 
 export const mutations = {
+  setQuizLocale: (val) => (state.quizLocale = val),
   setQuiz: (val) => (state.quiz = val),
   setCurrentQuestion: (val) => (state.currentQuestion = val),
   incrementCurrentQuestion: () => state.currentQuestion++,
