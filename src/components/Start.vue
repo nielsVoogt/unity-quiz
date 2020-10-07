@@ -1,12 +1,13 @@
 <template>
   <div>
-    <!-- <div>isQuizMaster: {{ isQuizMaster }}</div> -->
-
     <ChoosePlayerName
       @player-added="setNewPlayer"
       v-if="playerState === 'ADD_PLAYER'"
     />
-    <ChooseTopics @quiz-built="setQuiz" v-if="playerState === 'BUILD_QUIZ'" />
+    <ChooseTopics
+      @quiz-built="setNewQuiz"
+      v-if="playerState === 'BUILD_QUIZ'"
+    />
     <WaitingRoom
       @start-quiz="startQuiz"
       v-if="playerState === 'WAITING'"
@@ -14,20 +15,7 @@
       :players="players"
       :url="url"
     />
-
-    <div v-if="playerState === 'PLAYING'">
-      <div v-if="currentQuestion !== quiz.length">
-        <QuizProgress :quiz="quiz" :current-question="currentQuestion" />
-        <Question
-          :question="quiz[currentQuestion]"
-          :key="currentQuestion"
-          :is-quiz-master="isQuizMaster"
-          :countdown="countdown"
-          @question-answered="updateScore"
-        />
-      </div>
-      <div v-else>Hello</div>
-    </div>
+    <Quiz v-if="playerState === 'PLAYING'" />
   </div>
 </template>
 
@@ -36,8 +24,8 @@ import ChannelDetails from "@/components/ChannelDetails";
 import ChooseTopics from "@/components/ChooseTopics";
 import ChoosePlayerName from "@/components/ChoosePlayerName";
 import WaitingRoom from "@/components/WaitingRoom";
-import Question from "@/components/Question";
-import QuizProgress from "@/components/QuizProgress";
+import Quiz from "@/components/Quiz";
+import { getters, mutations } from "@/store";
 
 let channel = ChannelDetails.subscribeToPusher();
 
@@ -47,29 +35,24 @@ export default {
     ChoosePlayerName,
     ChooseTopics,
     WaitingRoom,
-    Question,
-    QuizProgress,
+    Quiz,
   },
   data() {
     return {
-      playerId: null,
-      playerScore: 0,
-      isQuizMaster: null,
-      presenceId: null, // This holds the current presence-id
+      presenceId: null,
       players: [],
       playerState: "ADD_PLAYER",
-      url: false, // This holds the current URL of the game
-      quiz: [],
-      currentQuestion: false,
-      collectedAnswers: 0,
-      countdown: false,
+      url: false,
     };
+  },
+  computed: {
+    ...getters,
   },
   watch: {
     collectedAnswers(val) {
       if (this.currentQuestion === this.quiz.length) {
         // Retrieve all user scores and display score
-        alert("ho");
+        alert("Quiz ended");
       }
 
       // Check if all players answered the question
@@ -82,6 +65,8 @@ export default {
     this.fetchData();
   },
   methods: {
+    ...mutations,
+
     fetchData() {
       // Sets the data instance presenceId variable to the result of the getUniqueId function
       this.presenceId = this.getUniqueId();
@@ -101,34 +86,30 @@ export default {
 
       // The pusher:member_added event is triggered when a user joins a channel.
       channel.bind("pusher:member_added", (members) => {
-        console.log("member_added", members);
+        // console.log("member_added", members);
         channel.trigger("client-send-quiz", { data: this.quiz });
       });
 
       // Once a subscription has been made to a presence channel, an event is triggered with a members iterator.
       channel.bind("pusher:subscription_succeeded", (members) => {
-        console.log("subscription_succeeded", members.me.id);
-
-        // this.playerId = members.me.id;
-
-        if (members.count !== 1) {
-          console.log("Found more players");
-        } else {
-          this.isQuizMaster = true;
+        // console.log("subscription_succeeded", members.me.id);
+        if (members.count === 1) {
+          this.setIsQuizMaster(true);
+          // this.isQuizMaster = true;
         }
       });
 
-      // The pusher:member_removed is triggered when a user leaves a channel. We decrease the number of players by one and also set the secondplayer boolean to false.
-      channel.bind("pusher:member_removed", (member) => {
-        console.log("member_removed", member);
+      // // The pusher:member_removed is triggered when a user leaves a channel. We decrease the number of players by one and also set the secondplayer boolean to false.
+      // channel.bind("pusher:member_removed", (member) => {
+      //   // console.log("member_removed", member);
 
-        if (member.count === 1) {
-          console.log("Only one left");
-        }
-      });
+      //   if (member.count === 1) {
+      //     console.log("Only one left");
+      //   }
+      // });
 
       channel.bind("client-send-quiz", (payload) => {
-        this.quiz = payload.data;
+        this.setQuiz(payload.data);
       });
 
       channel.bind("client-add-player", (payload) => {
@@ -141,12 +122,12 @@ export default {
       });
 
       channel.bind("client-player-anwsered-question", () => {
-        this.collectedAnswers++;
+        this.incrementCollectedAnswers();
       });
 
       channel.bind("client-question-update", (payload) => {
         this.playerState = "PLAYING";
-        this.currentQuestion = payload.data;
+        this.setCurrentQuestion(payload.data);
       });
 
       channel.bind("client-next-question", () => {
@@ -162,17 +143,15 @@ export default {
       return "id=" + Math.random().toString(36).substr(2, 8);
     },
 
-    setQuiz(quiz) {
-      this.quiz = quiz;
+    setNewQuiz(quiz) {
+      this.setQuiz(quiz);
       this.playerState = "WAITING";
     },
 
     startQuiz() {
       this.playerState = "PLAYING";
-      this.currentQuestion = 0;
-      channel.trigger("client-question-update", {
-        data: this.currentQuestion,
-      });
+      this.setCurrentQuestion(0);
+      channel.trigger("client-question-update", { data: this.currentQuestion });
     },
 
     triggerNextQuestion() {
@@ -181,12 +160,12 @@ export default {
     },
 
     nextQuestion() {
-      this.countdown = true;
+      this.setCountdown(true);
       let self = this;
       setTimeout(function () {
-        self.currentQuestion++;
-        self.collectedAnswers = 0;
-        self.countdown = false;
+        self.incrementCurrentQuestion();
+        self.resetCollectedAnswers();
+        self.setCountdown(false);
       }, 3000);
     },
 
@@ -201,30 +180,12 @@ export default {
       return id;
     },
 
-    updateScore(answer) {
-      if (!this.isQuizMaster) {
-        channel.trigger("client-player-anwsered-question", {});
-      } else {
-        if (answer === true) {
-          this.playerScore++;
-        }
-        this.collectedAnswers++;
-      }
-    },
-
     setNewPlayer(name) {
-      // const player = {
-      //   name: name,
-      //   // id: this.playerId,
-      // };
-
       if (this.isQuizMaster) {
         this.players.push(name);
         this.playerState = "BUILD_QUIZ";
       } else {
-        channel.trigger("client-add-player", {
-          data: name,
-        });
+        channel.trigger("client-add-player", { data: name });
         this.playerState = "WAITING";
       }
     },

@@ -12,7 +12,7 @@ export default new Router({
       component: () => import("@/components/Home"),
     },
     {
-      path: "/quiz",
+      path: "/start",
       name: "Start",
       component: () => import("@/components/Start"),
     },
