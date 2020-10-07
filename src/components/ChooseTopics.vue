@@ -38,6 +38,7 @@
 
 <script>
 import ChoosePlayerNameVue from "./ChoosePlayerName.vue";
+
 const mariuahana = [
   {
     question: ".... mariuahan 1",

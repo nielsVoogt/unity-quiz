@@ -23,7 +23,20 @@
 <script>
 export default {
   name: "waitingRoom",
-  props: ["players", "isQuizMaster", "url"],
+  props: {
+    players: {
+      type: Array,
+      required: true,
+    },
+    isQuizMaster: {
+      type: Boolean,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: false,
+    },
+  },
   methods: {
     startQuiz() {
       this.$emit("start-quiz");

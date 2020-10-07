@@ -13,6 +13,15 @@
 <script>
 export default {
   name: "quizProgress",
-  props: ["currentQuestion", "quiz"],
+  props: {
+    currentQuestion: {
+      type: Number,
+      required: true,
+    },
+    quiz: {
+      type: Array,
+      required: true,
+    },
+  },
 };
 </script>
