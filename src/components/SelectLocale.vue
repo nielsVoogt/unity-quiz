@@ -16,6 +16,8 @@ export default {
   },
   methods: {
     setLocale() {
+      // When someone starts a quiz the page refreshes and the i18n is reset to it's fallback
+      // To avoid this we set a locale key in sessionStorage and look for it in a mounted() hook
       sessionStorage.setItem("locale", this.$i18n.locale + "");
     },
   },

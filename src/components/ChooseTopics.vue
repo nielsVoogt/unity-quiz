@@ -22,7 +22,9 @@
 
 <script>
 import ChoosePlayerNameVue from "./ChoosePlayerName.vue";
-import { cannabis, xtc, ghb } from "@/topics.js";
+import { cannabis } from "@/topics/cannabis";
+import { xtc } from "@/topics/xtc";
+import { ghb } from "@/topics/ghb";
 
 export default {
   name: "chooseTopics",
@@ -55,7 +57,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$i18n.locale);
     this.topics.cannabis = cannabis[this.$i18n.locale];
     this.topics.xtc = xtc[this.$i18n.locale];
     this.topics.ghb = ghb[this.$i18n.locale];

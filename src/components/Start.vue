@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ $i18n.locale }}
     <ChoosePlayerName @player-added="setNewPlayer" v-if="playerState === 'ADD_PLAYER'" />
     <ChooseTopics @quiz-built="setNewQuiz" v-if="playerState === 'BUILD_QUIZ'" />
     <WaitingRoom
@@ -79,7 +80,14 @@ export default {
       // The pusher:member_added event is triggered when a user joins a channel.
       channel.bind("pusher:member_added", (members) => {
         console.log("member added");
-        channel.trigger("client-send-quiz", { data: this.quiz });
+
+        // When a new player enters a quiz we send the quiz and the quizLocale of the quizmaster
+        channel.trigger("client-send-quiz", {
+          data: {
+            quiz: this.quiz,
+            quizLocale: this.quizLocale,
+          },
+        });
       });
 
       // Once a subscription has been made to a presence channel, an event is triggered with a members iterator.
@@ -90,7 +98,8 @@ export default {
 
       channel.bind("client-send-quiz", (payload) => {
         console.log("send-quiz");
-        this.setQuiz(payload.data);
+        this.setQuiz(payload.data.quiz);
+        this.$i18n.locale = payload.data.quizLocale;
       });
 
       channel.bind("client-add-player", (payload) => {
@@ -118,6 +127,7 @@ export default {
     },
 
     setNewQuiz(quiz) {
+      this.setQuizLocale(this.$i18n.locale);
       this.setQuiz(quiz);
       this.playerState = "WAITING";
     },
