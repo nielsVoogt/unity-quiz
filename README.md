@@ -5,7 +5,7 @@ Uses `Vue`, `Pusher`, `i18n` and `Vue Router`.
 
 ### Why did I start this project?
 
-Due to the corona virus there are no party's and raves to provide drug education, but that doesn't mean people stopped taking drugs. In my opinion harm reduction is a great way to reduce accidental overdoses, increase knowledge on various substances and educate people on responsible drug use. To fill that gap in corona times I deceided to start this project. I was looking for a project to improve my Vue skills and this is a fun and challenging project to build.
+My SO is a peer educator for Unity. Unity is a free drug education/harm reduction service funded by the Dutch goverment to educate ravers on various substances when visiting a rave. Due to the corona virus there are no party's and raves to provide this education, but that doesn't mean people stopped taking drugs. In my opinion harm reduction is a great way to reduce accidental overdoses, increase knowledge on various substances and educate people on responsible drug use. To fill that gap in corona times I deceided to start this project. I was looking for a project to improve my Vue skills and this is a fun and challenging project to build.
 
 I'm planning on hosting the quiz on Firebase and see if people pick it up.
 
