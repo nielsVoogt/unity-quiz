@@ -29,3 +29,11 @@ $ npm run dev
 ```
 
 After running these commands visit http://localhost:8080/
+
+### TODO:
+
+- [ ] Add beforeRouteEnter to define unique URL so there's no refresh after landing on Start.
+- [ ] Clean it up, look into optimizing channels (I think it could be done better)
+- [ ] Add confetti (catdad/canvas-confetti)
+- [ ] Add quiz content
+- [ ] Add translations
