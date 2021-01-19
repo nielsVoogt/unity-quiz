@@ -11,17 +11,12 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "quizProgress",
-  props: {
-    currentQuestion: {
-      type: Number,
-      required: true,
-    },
-    quiz: {
-      type: Array,
-      required: true,
-    },
+  computed: {
+    ...mapGetters(["currentQuestion", "quiz"]),
   },
 };
 </script>

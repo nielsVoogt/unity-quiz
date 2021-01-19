@@ -1,4 +1,7 @@
 const getters = {
+  currentQuestion(state) {
+    return state.currentQuestion;
+  },
   playerName(state) {
     return state.playerName;
   },

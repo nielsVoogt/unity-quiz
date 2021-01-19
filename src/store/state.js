@@ -10,6 +10,7 @@ const state = {
   playerName: false,
   players: [],
   quiz: false,
+  currentQuestion: false,
 };
 
 export default state;

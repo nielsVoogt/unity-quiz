@@ -11,18 +11,12 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "waitingRoom",
-  props: {
-    players: {
-      type: Array,
-      required: true,
-    },
-  },
-  methods: {
-    startQuiz() {
-      this.$emit("start-quiz");
-    },
+  computed: {
+    ...mapGetters(["players"]),
   },
 };
 </script>

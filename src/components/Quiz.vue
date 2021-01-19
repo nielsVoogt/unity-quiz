@@ -1,8 +1,12 @@
 <template>
   <div>
-    <!-- WAITINGROOM -->
     <!-- QUIZQUESTIONS -->
     <!-- QUIZRESULTS -->
+
+    <WaitingRoom v-if="currentQuestion === false" />
+    <div v-else>
+      <QuizProgress />
+    </div>
     {{ quizMaster }}
     {{ players }}
   </div>
@@ -10,6 +14,8 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import WaitingRoom from "@/components/WaitingRoom";
+import QuizProgress from "@/components/QuizProgress";
 import Pusher from "pusher-js";
 
 const pusher = new Pusher(process.env.VUE_APP_PUSHER_KEY, {
@@ -23,13 +29,16 @@ const debug = true;
 
 export default {
   name: "quiz",
+  components: {
+    WaitingRoom,
+  },
   data() {
     return {
       quizMaster: false,
     };
   },
   computed: {
-    ...mapGetters(["playerName", "players", "quiz"]),
+    ...mapGetters(["playerName", "players", "quiz", "currentQuestion"]),
   },
   methods: {
     ...mapActions(["addPlayersAction", "addPlayerAction", "addQuizAction"]),
@@ -59,17 +68,11 @@ export default {
         } else {
           // Bind to channel with own ID to receive initial setup (quiz, players, locale)
           channel.bind(`client-${members.me.id}-setup`, (data, metadata) => {
-            if (debug)
-              console.log("I received", data, "from user", metadata.user_id);
+            if (debug) console.log("received", data, "from", metadata.user_id);
 
-            // Initial setup of existing players
-            this.addPlayersAction(data.players);
-
-            // Initial setup of local quiz object
-            this.addQuizAction(data.quiz);
-
-            // We add ourselves to the players array
-            this.addPlayerAction(this.playerName);
+            this.addPlayersAction(data.players); // Initial setup of existing players
+            this.addQuizAction(data.quiz); // Initial setup of local quiz object
+            this.addPlayerAction(this.playerName); // We add ourselves to the players array
 
             // We share our name with other players so they can update their players array
             channel.trigger("client-updates", {

@@ -1,11 +1,7 @@
 <template>
   <div>
     {{ $i18n.locale }}
-    <ChoosePlayerName
-      @player-added="setNewPlayer"
-      v-if="playerState === 'ADD_PLAYER'"
-    />
-    <CreateQuiz @quiz-built="setNewQuiz" v-if="playerState === 'BUILD_QUIZ'" />
+
     <WaitingRoom
       @start-quiz="startQuiz"
       v-if="playerState === 'WAITING'"
@@ -28,8 +24,6 @@ let channel = ChannelDetails.subscribeToPusher();
 export default {
   name: "start",
   components: {
-    ChoosePlayerName,
-    CreateQuiz,
     WaitingRoom,
     Quiz,
   },
