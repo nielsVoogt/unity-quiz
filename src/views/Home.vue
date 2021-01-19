@@ -2,12 +2,12 @@
   <div>
     <h1>{{ $t("home.header") }}</h1>
     <SelectLocale />
-    <router-link :to="{ name: 'Start' }"> Start a Quiz </router-link>
+    <router-link :to="{ name: 'setup' }"> Start a Quiz </router-link>
   </div>
 </template>
 
 <script>
-import SelectLocale from "./SelectLocale.vue";
+import SelectLocale from "@/components/SelectLocale.vue";
 
 export default {
   name: "home",

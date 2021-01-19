@@ -7,16 +7,6 @@
       </li>
     </ul>
     <div v-else>Loading players</div>
-
-    <div v-if="isQuizMaster">
-      <p>Invite people with the following url:</p>
-      <div>{{ url }}</div>
-      <br />
-      <button :disabled="players.length === 1" @click="startQuiz">
-        Start the quiz
-      </button>
-    </div>
-    <div v-else>Waiting on quizmaster to start the quiz</div>
   </div>
 </template>
 
@@ -27,14 +17,6 @@ export default {
     players: {
       type: Array,
       required: true,
-    },
-    isQuizMaster: {
-      type: Boolean,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: false,
     },
   },
   methods: {

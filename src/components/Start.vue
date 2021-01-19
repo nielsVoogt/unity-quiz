@@ -1,14 +1,15 @@
 <template>
   <div>
     {{ $i18n.locale }}
-    <ChoosePlayerName @player-added="setNewPlayer" v-if="playerState === 'ADD_PLAYER'" />
-    <ChooseTopics @quiz-built="setNewQuiz" v-if="playerState === 'BUILD_QUIZ'" />
+    <ChoosePlayerName
+      @player-added="setNewPlayer"
+      v-if="playerState === 'ADD_PLAYER'"
+    />
+    <CreateQuiz @quiz-built="setNewQuiz" v-if="playerState === 'BUILD_QUIZ'" />
     <WaitingRoom
       @start-quiz="startQuiz"
       v-if="playerState === 'WAITING'"
-      :is-quiz-master="isQuizMaster"
       :players="players"
-      :url="url"
     />
     <Quiz v-if="playerState === 'PLAYING'" />
   </div>
@@ -16,7 +17,7 @@
 
 <script>
 import ChannelDetails from "@/components/ChannelDetails";
-import ChooseTopics from "@/components/ChooseTopics";
+import CreateQuiz from "@/components/CreateQuiz";
 import ChoosePlayerName from "@/components/ChoosePlayerName";
 import WaitingRoom from "@/components/WaitingRoom";
 import Quiz from "@/components/Quiz";
@@ -28,7 +29,7 @@ export default {
   name: "start",
   components: {
     ChoosePlayerName,
-    ChooseTopics,
+    CreateQuiz,
     WaitingRoom,
     Quiz,
   },
@@ -64,38 +65,6 @@ export default {
     ...mutations,
 
     fetchData() {
-      // Sets the data instance presenceId variable to the result of the getUniqueId function
-      this.presenceId = this.getUniqueId();
-
-      // This checks if there's no presence ID in the URL via the checkPresenceID function and
-      // appends the presenceId to the current URL so that we can have the URL end with a parameter
-      if (!this.checkPresenceID()) {
-        var separator = window.location.href.indexOf("?") === -1 ? "?" : "&";
-        window.location.href = window.location.href + separator + this.presenceId;
-      }
-
-      // Sets the data instance url variable to the current URL.
-      this.url = window.location.href;
-
-      // The pusher:member_added event is triggered when a user joins a channel.
-      channel.bind("pusher:member_added", (members) => {
-        console.log("member added");
-
-        // When a new player enters a quiz we send the quiz and the quizLocale of the quizmaster
-        channel.trigger("client-send-quiz", {
-          data: {
-            quiz: this.quiz,
-            quizLocale: this.quizLocale,
-          },
-        });
-      });
-
-      // Once a subscription has been made to a presence channel, an event is triggered with a members iterator.
-      channel.bind("pusher:subscription_succeeded", (members) => {
-        console.log("subscription succeeded");
-        if (members.count === 1) this.setIsQuizMaster(true);
-      });
-
       channel.bind("client-send-quiz", (payload) => {
         console.log("send-quiz");
         this.setQuiz(payload.data.quiz);

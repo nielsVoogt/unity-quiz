@@ -1,5 +1,5 @@
-import Vue from "vue";
 import Router from "vue-router";
+import Vue from "vue";
 
 Vue.use(Router);
 
@@ -8,13 +8,18 @@ export default new Router({
   routes: [
     {
       path: "/",
-      name: "Home",
-      component: () => import("@/components/Home"),
+      name: "home",
+      component: () => import("@/views/Home"),
     },
     {
-      path: "/start",
-      name: "Start",
-      component: () => import("@/components/Start"),
+      path: "/:id",
+      name: "play",
+      component: () => import("@/views/Play"),
+    },
+    {
+      path: "/setup",
+      name: "setup",
+      component: () => import("@/views/Setup"),
     },
   ],
 });

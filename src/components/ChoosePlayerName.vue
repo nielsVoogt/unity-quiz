@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "choosePlayerName",
   data() {
@@ -15,8 +17,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["addPlayerNameAction"]),
     addPlayer() {
-      this.$emit("player-added", this.playerName);
+      this.addPlayerNameAction(this.playerName);
     },
   },
 };
