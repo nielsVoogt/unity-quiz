@@ -7,6 +7,9 @@ const mutations = {
   [types.ADD_PLAYER](state, player) {
     state.players.unshift(player);
   },
+  [types.ADD_PLAYERS](state, players) {
+    state.players = players;
+  },
   [types.ADD_QUIZ](state, quiz) {
     state.quiz = quiz;
   },
