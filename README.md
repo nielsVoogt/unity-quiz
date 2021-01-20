@@ -1,7 +1,6 @@
 # unity-quiz
 
-A multiplayer harm reduction quiz you can play with your friends that doesn't require login or saves any user information.<br>
-Uses `Vue`, `Pusher`, `i18n`, `Vue Router` and `Vuex`.
+A multiplayer harm reduction quiz you can play with your friends that doesn't require login or saves any user information. Uses `Vue`, `Pusher`, `i18n`, `Vue Router` and `Vuex`.
 
 ### Why did I start this project?
 
