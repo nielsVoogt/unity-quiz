@@ -1,39 +1,43 @@
 <template>
-  <QuizLayout>
-    <template v-slot:top>
-      <p>Select one or more quiz topics</p>
-    </template>
-    <template v-slot:bottom>
-      <VueSlickCarousel
-        :arrows="false"
-        :dots="false"
-        v-if="topics"
-        v-bind="slickSettings"
-      >
-        <div
-          v-for="(topic, topicName, index) in topics"
-          :key="index"
-          class="topic"
-          @click="addOrRemoveTopic(topicName)"
+  <div>
+    <QuizLayout>
+      <template v-slot:top>
+        <p>Select one or more quiz topics</p>
+      </template>
+      <template v-slot:bottom>
+        <VueSlickCarousel
+          :arrows="false"
+          :dots="false"
+          v-if="topics"
+          v-bind="slickSettings"
         >
-          <div class="topic-details">
-            <div class="topic-name">{{ topicName }}</div>
-            <div class="topic-question-count">{{ topic.length }} questions</div>
+          <div
+            v-for="(topic, topicName, index) in topics"
+            :key="index"
+            class="topic"
+            @click="addOrRemoveTopic(topicName)"
+          >
+            <div class="topic-details">
+              <div class="topic-name">{{ topicName }}</div>
+              <div class="topic-question-count">
+                {{ topic.length }} questions
+              </div>
+            </div>
+            <div class="topic-button">
+              <button v-if="selectedTopics.includes(topicName)">
+                Add topic
+              </button>
+              <button v-else>
+                Add topic
+              </button>
+            </div>
           </div>
-          <div class="topic-button">
-            <button v-if="selectedTopics.includes(topicName)">
-              Add topic
-            </button>
-            <button v-else>
-              Add topic
-            </button>
-          </div>
-        </div>
-      </VueSlickCarousel>
+        </VueSlickCarousel>
 
-      <p>{{ selectedTopics.length }} topics selected</p>
-      <button @click="createQuizFromSelectedTopics">Create quiz</button>
-    </template>
+        <p>{{ selectedTopics.length }} topics selected</p>
+        <button @click="createQuizFromSelectedTopics">Create quiz</button>
+      </template>
+    </QuizLayout>
 
     {{ selectedTopics }}
 
@@ -42,7 +46,7 @@
       <input type="text" v-model="url" />
       <button v-on:click="startQuiz()">Copy and play</button>
     </div>
-  </QuizLayout>
+  </div>
 </template>
 
 <script>
@@ -118,7 +122,7 @@ export default {
       this.id = Math.random()
         .toString(36)
         .substr(2, 8);
-      this.url = `localhost:8080${this.id}`;
+      this.url = process.env.VUE_APP_URL + "/" + this.id;
       this.showQuizBuiltModal();
     },
 
@@ -127,7 +131,12 @@ export default {
     },
 
     startQuiz() {
-      this.$router.push({ name: "play", params: { id: this.id } });
+      this.$router.push({
+        name: "play",
+        params: {
+          id: this.id,
+        },
+      });
     },
   },
   mounted() {
@@ -141,15 +150,34 @@ export default {
 </script>
 
 <style lang="scss">
-.slick-slide {
-  padding: 0.5em;
-  transform: scale(0.9);
-  transition: transform 0.2s ease-in;
+/* ---------- MODAL ---------- */
 
-  &.slick-center {
-    transform: none;
+.modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
+/* ---------- SLICK SLIDER ---------- */
+
+.slick-slider {
+  margin-left: -2em;
+  margin-right: -2em;
+
+  .slick-slide {
+    padding: 0.5em;
+    transform: scale(0.9);
+    transition: transform 0.2s ease-in;
+
+    &.slick-center {
+      transform: none;
+    }
   }
 }
+
+/* ---------- TOPIC ---------- */
 
 .topic {
   background: grey;
