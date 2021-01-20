@@ -4,9 +4,18 @@
       <p>Select one or more quiz topics</p>
     </template>
     <template v-slot:bottom>
-
-      <VueSlickCarousel :arrows="false" :dots="false" v-if="topics" v-bind="slickSettings">
-        <div v-for="(topic, topicName, index) in topics" :key="index" class="topic" @click="addOrRemoveTopic(topicName)">
+      <VueSlickCarousel
+        :arrows="false"
+        :dots="false"
+        v-if="topics"
+        v-bind="slickSettings"
+      >
+        <div
+          v-for="(topic, topicName, index) in topics"
+          :key="index"
+          class="topic"
+          @click="addOrRemoveTopic(topicName)"
+        >
           <div class="topic-details">
             <div class="topic-name">{{ topicName }}</div>
             <div class="topic-question-count">{{ topic.length }} questions</div>
@@ -40,9 +49,9 @@
 import { mapActions } from "vuex";
 import QuizLayout from "@/components/layout/QuizLayout";
 
-import VueSlickCarousel from 'vue-slick-carousel'
-import 'vue-slick-carousel/dist/vue-slick-carousel.css'
-import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
+import VueSlickCarousel from "vue-slick-carousel";
+import "vue-slick-carousel/dist/vue-slick-carousel.css";
+import "vue-slick-carousel/dist/vue-slick-carousel-theme.css";
 
 import { cannabis } from "@/topics/cannabis";
 import { xtc } from "@/topics/xtc";
@@ -52,7 +61,7 @@ export default {
   name: "CreateQuiz",
   components: {
     QuizLayout,
-    VueSlickCarousel
+    VueSlickCarousel,
   },
   data() {
     return {
@@ -63,21 +72,21 @@ export default {
       url: false,
       slickSettings: {
         focusOnSelect: false,
-        speed:500,
+        speed: 500,
         slidesToShow: 1,
         slidesToScroll: 1,
         centerMode: true,
         centerPadding: "50px",
         infinite: true,
-      }
+      },
     };
   },
   methods: {
     ...mapActions(["addQuizAction"]),
 
     addOrRemoveTopic(topic) {
-      if(this.selectedTopics.includes(topic)) {
-        this.selectedTopics = this.selectedTopics.filter(e => e !== topic);
+      if (this.selectedTopics.includes(topic)) {
+        this.selectedTopics = this.selectedTopics.filter((e) => e !== topic);
       } else {
         this.selectedTopics.push(topic);
       }
@@ -125,18 +134,17 @@ export default {
     this.topics = {
       cannabis: cannabis[this.$i18n.locale],
       xtc: xtc[this.$i18n.locale],
-      ghb: ghb[this.$i18n.locale]
-    }
+      ghb: ghb[this.$i18n.locale],
+    };
   },
 };
 </script>
 
 <style lang="scss">
-
 .slick-slide {
-  padding: .5em;
-  transform: scale(.9);
-  transition: transform .2s ease-in;
+  padding: 0.5em;
+  transform: scale(0.9);
+  transition: transform 0.2s ease-in;
 
   &.slick-center {
     transform: none;
@@ -154,11 +162,11 @@ export default {
   .topic-name {
     font-weight: 700;
     font-size: 21px;
-    margin-bottom: .5em;
+    margin-bottom: 0.5em;
   }
 
   .topic-question-count {
-    color: #9F9F9F;
+    color: #9f9f9f;
   }
 
   .topic-button {
@@ -166,5 +174,4 @@ export default {
     border-top: 1px solid red;
   }
 }
-
 </style>
