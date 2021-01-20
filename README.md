@@ -1,7 +1,7 @@
 # unity-quiz
 
 A multiplayer harm reduction quiz you can play with your friends that doesn't require login or saves any user information.<br>
-Uses `Vue`, `Pusher`, `i18n` and `Vue Router`.
+Uses `Vue`, `Pusher`, `i18n`, `Vue Router` and `Vuex`.
 
 ### Why did I start this project?
 
@@ -29,11 +29,3 @@ $ npm run dev
 ```
 
 After running these commands visit http://localhost:8080/
-
-### TODO:
-
-- [ ] Add beforeRouteEnter to define unique URL so there's no refresh after landing on Start.
-- [ ] Clean it up, look into optimizing channels (I think it could be done better)
-- [ ] Add confetti (catdad/canvas-confetti)
-- [ ] Add quiz content
-- [ ] Add translations
