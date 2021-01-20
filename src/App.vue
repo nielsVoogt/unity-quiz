@@ -1,7 +1,5 @@
  <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+   <router-view></router-view>
 </template>
 
 <script>
@@ -10,11 +8,8 @@ export default {
 };
 </script>
 
-<style>
-#app {
-  height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-}
+<style lang="scss">
+@import 'style/reset';
+@import 'style/variables';
+@import 'style/base';
 </style>

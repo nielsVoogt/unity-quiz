@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import SelectLocale from "@/components/SelectLocale.vue";
+import SelectLocale from "@/components/home/SelectLocale.vue";
 
 export default {
   name: "home",

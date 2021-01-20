@@ -1,0 +1,29 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;700&family=Rowdies:wght@700&display=swap');
+
+//font-family: 'Roboto Slab', serif;
+//font-family: 'Rowdies', cursive;
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before, *:after {
+  box-sizing: inherit;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 400;
+  color: #323232;
+  min-height: -webkit-fill-available; /* mobile viewport bug fix */
+  //background-color: #04294F;
+}

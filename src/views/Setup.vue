@@ -8,8 +8,8 @@
 <script>
 import { mapGetters } from "vuex";
 
-import ChoosePlayerName from "@/components/ChoosePlayerName";
-import CreateQuiz from "@/components/CreateQuiz";
+import ChoosePlayerName from "@/components/setup/ChoosePlayerName";
+import CreateQuiz from "@/components/setup/CreateQuiz";
 
 export default {
   name: "setup",

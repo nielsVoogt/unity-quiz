@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import ChoosePlayerName from "@/components/ChoosePlayerName";
-import Quiz from "@/components/Quiz";
+import ChoosePlayerName from "@/components/setup/ChoosePlayerName";
+import Quiz from "@/components/quiz/Quiz";
 
 import { mapGetters } from "vuex";
 
