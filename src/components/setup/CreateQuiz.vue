@@ -25,7 +25,6 @@
       <p>{{ selectedTopics.length }} topics selected</p>
       <button @click="createQuizFromSelectedTopics">Create quiz</button>
     </template>
-
     {{ selectedTopics }}
 
     <div class="modal" v-if="showModal">
