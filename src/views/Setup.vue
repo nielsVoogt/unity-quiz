@@ -1,10 +1,8 @@
 <template>
-  <div class="container">
-    <transition name="slide">
-      <ChoosePlayerName v-if="!playerName" />
-      <CreateQuiz v-else />
-    </transition>
-  </div>
+  <transition name="slide">
+    <ChoosePlayerName v-if="!playerName" />
+    <CreateQuiz v-else />
+  </transition>
 </template>
 
 <script>
@@ -32,17 +30,12 @@ export default {
 
 <style>
 
-.container {
-  height: 100vh;
-  overflow: hidden;
-}
-
 .slide-leave-active,
 .slide-enter-active {
-  transition: all 2s;
+  transition: all 1s;
   position: absolute;
-  top: 0;
   width: 100%;
+  top: 0;
 }
 
 .slide-enter {
