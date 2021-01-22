@@ -2,7 +2,7 @@
   <div class="quiz-waitingroom">
     <ul v-if="players && players.length">
       <li v-for="(player, index) in players" :key="index" class="player">
-        <span class="player-number">{{index}}</span>
+        <span class="player-number">{{ index }}</span>
         <span class="player-name">{{ player }}</span>
       </li>
     </ul>
@@ -21,7 +21,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 // ------------- PLAYER CONTAINER
 
 .quiz-waitingroom {
@@ -35,7 +34,7 @@ export default {
 
 .player {
   padding: 1.25em;
-  border-bottom: 1px solid #EDEDED;
+  border-bottom: 1px solid #ededed;
   display: flex;
   line-height: normal;
 

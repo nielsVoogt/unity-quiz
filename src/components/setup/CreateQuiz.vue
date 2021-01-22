@@ -1,30 +1,44 @@
 <template>
-  <QuizLayout>
-    <template v-slot:top>
-      <p>Select one or more quiz topics</p>
-    </template>
-    <template v-slot:bottom>
-
-      <VueSlickCarousel :arrows="false" :dots="false" v-if="topics" v-bind="slickSettings">
-        <div v-for="(topic, topicName, index) in topics" :key="index" class="topic" @click="addOrRemoveTopic(topicName)">
-          <div class="topic-details">
-            <div class="topic-name">{{ topicName }}</div>
-            <div class="topic-question-count">{{ topic.length }} questions</div>
+  <div>
+    <QuizLayout>
+      <template v-slot:top>
+        <p>Select one or more quiz topics</p>
+      </template>
+      <template v-slot:bottom>
+        <VueSlickCarousel
+          :arrows="false"
+          :dots="false"
+          v-if="topics"
+          v-bind="slickSettings"
+        >
+          <div
+            v-for="(topic, topicName, index) in topics"
+            :key="index"
+            class="topic"
+            @click="addOrRemoveTopic(topicName)"
+          >
+            <div class="topic-details">
+              <div class="topic-name">{{ topicName }}</div>
+              <div class="topic-question-count">
+                {{ topic.length }} questions
+              </div>
+            </div>
+            <div class="topic-button">
+              <button v-if="selectedTopics.includes(topicName)">
+                Add topic
+              </button>
+              <button v-else>
+                Add topic
+              </button>
+            </div>
           </div>
-          <div class="topic-button">
-            <button v-if="selectedTopics.includes(topicName)">
-              Add topic
-            </button>
-            <button v-else>
-              Add topic
-            </button>
-          </div>
-        </div>
-      </VueSlickCarousel>
+        </VueSlickCarousel>
 
-      <p>{{ selectedTopics.length }} topics selected</p>
-      <button @click="createQuizFromSelectedTopics">Create quiz</button>
-    </template>
+        <p>{{ selectedTopics.length }} topics selected</p>
+        <button @click="createQuizFromSelectedTopics">Create quiz</button>
+      </template>
+    </QuizLayout>
+
     {{ selectedTopics }}
 
     <div class="modal" v-if="showModal">
@@ -32,16 +46,16 @@
       <input type="text" v-model="url" />
       <button v-on:click="startQuiz()">Copy and play</button>
     </div>
-  </QuizLayout>
+  </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
 import QuizLayout from "@/components/layout/QuizLayout";
 
-import VueSlickCarousel from 'vue-slick-carousel'
-import 'vue-slick-carousel/dist/vue-slick-carousel.css'
-import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
+import VueSlickCarousel from "vue-slick-carousel";
+import "vue-slick-carousel/dist/vue-slick-carousel.css";
+import "vue-slick-carousel/dist/vue-slick-carousel-theme.css";
 
 import { cannabis } from "@/topics/cannabis";
 import { xtc } from "@/topics/xtc";
@@ -51,7 +65,7 @@ export default {
   name: "CreateQuiz",
   components: {
     QuizLayout,
-    VueSlickCarousel
+    VueSlickCarousel,
   },
   data() {
     return {
@@ -62,21 +76,21 @@ export default {
       url: false,
       slickSettings: {
         focusOnSelect: false,
-        speed:500,
+        speed: 500,
         slidesToShow: 1,
         slidesToScroll: 1,
         centerMode: true,
         centerPadding: "50px",
         infinite: true,
-      }
+      },
     };
   },
   methods: {
     ...mapActions(["addQuizAction"]),
 
     addOrRemoveTopic(topic) {
-      if(this.selectedTopics.includes(topic)) {
-        this.selectedTopics = this.selectedTopics.filter(e => e !== topic);
+      if (this.selectedTopics.includes(topic)) {
+        this.selectedTopics = this.selectedTopics.filter((e) => e !== topic);
       } else {
         this.selectedTopics.push(topic);
       }
@@ -108,7 +122,7 @@ export default {
       this.id = Math.random()
         .toString(36)
         .substr(2, 8);
-      this.url = `localhost:8080${this.id}`;
+      this.url = process.env.VUE_APP_URL + "/" + this.id;
       this.showQuizBuiltModal();
     },
 
@@ -117,30 +131,53 @@ export default {
     },
 
     startQuiz() {
-      this.$router.push({ name: "play", params: { id: this.id } });
+      this.$router.push({
+        name: "play",
+        params: {
+          id: this.id,
+        },
+      });
     },
   },
   mounted() {
     this.topics = {
       cannabis: cannabis[this.$i18n.locale],
       xtc: xtc[this.$i18n.locale],
-      ghb: ghb[this.$i18n.locale]
-    }
+      ghb: ghb[this.$i18n.locale],
+    };
   },
 };
 </script>
 
 <style lang="scss">
+/* ---------- MODAL ---------- */
 
-.slick-slide {
-  padding: .5em;
-  transform: scale(.9);
-  transition: transform .2s ease-in;
+.modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
 
-  &.slick-center {
-    transform: none;
+/* ---------- SLICK SLIDER ---------- */
+
+.slick-slider {
+  margin-left: -2em;
+  margin-right: -2em;
+
+  .slick-slide {
+    padding: 0.5em;
+    transform: scale(0.9);
+    transition: transform 0.2s ease-in;
+
+    &.slick-center {
+      transform: none;
+    }
   }
 }
+
+/* ---------- TOPIC ---------- */
 
 .topic {
   background: grey;
@@ -153,11 +190,11 @@ export default {
   .topic-name {
     font-weight: 700;
     font-size: 21px;
-    margin-bottom: .5em;
+    margin-bottom: 0.5em;
   }
 
   .topic-question-count {
-    color: #9F9F9F;
+    color: #9f9f9f;
   }
 
   .topic-button {
@@ -165,5 +202,4 @@ export default {
     border-top: 1px solid red;
   }
 }
-
 </style>

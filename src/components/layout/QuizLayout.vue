@@ -11,12 +11,11 @@
 
 <script>
 export default {
-  name: "quiz-layout"
-}
+  name: "quiz-layout",
+};
 </script>
 
 <style lang="scss">
-
 .quiz-layout {
   height: 100vh;
 }
@@ -31,5 +30,4 @@ export default {
   height: 70vh;
   padding: 2em;
 }
-
 </style>

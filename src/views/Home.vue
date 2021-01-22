@@ -2,7 +2,9 @@
   <div>
     <h1>{{ $t("home.header") }}</h1>
     <SelectLocale />
-    <router-link :to="{ name: 'setup' }"> Start a Quiz </router-link>
+    <router-link :to="{ name: 'setup' }">
+      Start a Quiz
+    </router-link>
   </div>
 </template>
 
