@@ -8,7 +8,12 @@ const actions = {
     commit(types.ADD_ANSWER, answer);
     commit(types.INCREMENT_COLLECTED_ANSWERS);
   },
-  nextQuestionAction({ commit }) {
+  nextQuestionAction({ commit, state }) {
+    if (state.currentQuestion + 1 === state.quiz.length) {
+      console.log("end reached");
+      return;
+    }
+
     commit(types.SET_COUNTDOWN, true);
     setTimeout(() => {
       commit(types.SET_COUNTDOWN, false);
