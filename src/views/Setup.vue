@@ -1,8 +1,6 @@
 <template>
-  <transition name="slide">
-    <ChoosePlayerName v-if="!playerName" />
-    <CreateQuiz v-else />
-  </transition>
+  <ChoosePlayerName v-if="!playerName" />
+  <CreateQuiz v-else />
 </template>
 
 <script>
@@ -17,33 +15,8 @@ export default {
     ChoosePlayerName,
     CreateQuiz,
   },
-  data() {
-    return {
-      animationFinished: false,
-    }
-  },
   computed: {
     ...mapGetters(["playerName"]),
   },
 };
 </script>
-
-<style>
-
-.slide-leave-active,
-.slide-enter-active {
-  transition: all 1s;
-  position: absolute;
-  width: 100%;
-  top: 0;
-}
-
-.slide-enter {
-  transform: translateY(100%);
-}
-
-.slide-leave-to {
-  transform: translateY(-100%);
-}
-
-</style>

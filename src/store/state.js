@@ -11,6 +11,9 @@ const state = {
   players: [],
   quiz: false,
   currentQuestion: false,
+  answers: [],
+  collectedAnswers: 0,
+  countdown: false,
 };
 
 export default state;

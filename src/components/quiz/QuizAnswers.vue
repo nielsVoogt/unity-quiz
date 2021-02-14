@@ -1,17 +1,16 @@
 <template>
   <div>
-    <div v-if="result === null">
-      <h1>{{ question.question }}</h1>
+    <div v-if="showFeedback === false">
       <button
         @click="checkAnswer(answer)"
-        v-for="(answer, index) in question.answers"
+        v-for="(answer, index) in this.quiz[this.currentQuestion].answers"
         :key="index"
       >
         {{ answer.answer }}
       </button>
     </div>
     <div v-else>
-      {{ result }}
+      <!-- {{ result }} -->
       <div v-if="countdown === false">Waiting for other players</div>
       <div v-else>Countdown started</div>
     </div>
@@ -19,26 +18,25 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
-  name: "question",
-  props: {
-    question: {
-      type: Object,
-      required: true,
-    },
-    countdown: {
-      type: Boolean,
-      required: true,
-    },
+  name: "QuizAnswers",
+  computed: {
+    ...mapGetters(["quiz", "countdown", "currentQuestion"]),
   },
   data() {
     return {
-      result: null,
+      showFeedback: false,
     };
+  },
+  watch: {
+    currentQuestion: function(old, w) {
+      this.showFeedback = false;
+    },
   },
   methods: {
     checkAnswer(answer) {
-      this.result = answer.correct;
+      this.showFeedback = true;
       this.$emit("question-answered", answer.correct);
     },
   },

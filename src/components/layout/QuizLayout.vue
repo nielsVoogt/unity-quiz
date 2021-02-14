@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "quiz-layout",
+  name: "QuizLayout",
 };
 </script>
 

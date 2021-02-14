@@ -3,16 +3,16 @@ export const cannabis = {
     {
       question: ".... EN !!! cannabis 1",
       answers: [
-        { answer: "a", correct: false },
-        { answer: "b", correct: true },
+        { answer: "een antwoord", correct: false },
+        { answer: "voor velen", correct: true },
       ],
       feedback: "bla..",
     },
     {
       question: ".... EN !!! cannabis 2",
       answers: [
-        { answer: "a", correct: false },
-        { answer: "b", correct: true },
+        { answer: "ook voor andere", correct: false },
+        { answer: "nog een antwoord", correct: true },
       ],
       feedback: "bla..",
     },

@@ -6,6 +6,10 @@
         <span class="player-name">{{ player }}</span>
       </li>
     </ul>
+
+    <button v-if="quizMaster" @click="startQuiz()">
+      Start the quiz
+    </button>
   </div>
 </template>
 
@@ -14,8 +18,19 @@ import { mapGetters } from "vuex";
 
 export default {
   name: "waitingRoom",
+  props: {
+    quizMaster: {
+      type: Boolean,
+      required: true,
+    },
+  },
   computed: {
     ...mapGetters(["players"]),
+  },
+  methods: {
+    startQuiz() {
+      this.$emit("start-quiz");
+    },
   },
 };
 </script>

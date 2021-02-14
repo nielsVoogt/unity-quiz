@@ -15,7 +15,6 @@
             v-for="(topic, topicName, index) in topics"
             :key="index"
             class="topic"
-            @click="addOrRemoveTopic(topicName)"
           >
             <div class="topic-details">
               <div class="topic-name">{{ topicName }}</div>
@@ -24,11 +23,9 @@
               </div>
             </div>
             <div class="topic-button">
-              <button v-if="selectedTopics.includes(topicName)">
-                Add topic
-              </button>
-              <button v-else>
-                Add topic
+              <button @click="addOrRemoveTopic(topicName)">
+                <span v-if="selectedTopics.includes(topicName)">Add topic</span>
+                <span v-else> Add topic</span>
               </button>
             </div>
           </div>
@@ -39,19 +36,15 @@
       </template>
     </QuizLayout>
 
-    {{ selectedTopics }}
-
-    <div class="modal" v-if="showModal">
-      we created your quiz!
-      <input type="text" v-model="url" />
-      <button v-on:click="startQuiz()">Copy and play</button>
-    </div>
+    <QuizCreatedModal :url="url" :show="showModal" :id="id" />
   </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
 import QuizLayout from "@/components/layout/QuizLayout";
+
+import QuizCreatedModal from "@/components/setup/QuizCreatedModal";
 
 import VueSlickCarousel from "vue-slick-carousel";
 import "vue-slick-carousel/dist/vue-slick-carousel.css";
@@ -66,14 +59,15 @@ export default {
   components: {
     QuizLayout,
     VueSlickCarousel,
+    QuizCreatedModal,
   },
   data() {
     return {
       selectedTopics: [],
       topics: false,
       showModal: false,
-      id: false,
-      url: false,
+      id: "",
+      url: "",
       slickSettings: {
         focusOnSelect: false,
         speed: 500,
@@ -114,8 +108,10 @@ export default {
       });
 
       const shuffledQuiz = this.shuffle(quiz.flat());
-      this.addQuizAction(shuffledQuiz);
-      this.generateQuizUrl();
+
+      this.addQuizAction(shuffledQuiz); // Add quiz to store data
+      this.generateQuizUrl(); // Generate Quiz URL
+      this.showModal = true; // Show the modal
     },
 
     generateQuizUrl() {
@@ -123,20 +119,6 @@ export default {
         .toString(36)
         .substr(2, 8);
       this.url = process.env.VUE_APP_URL + "/" + this.id;
-      this.showQuizBuiltModal();
-    },
-
-    showQuizBuiltModal() {
-      this.showModal = true;
-    },
-
-    startQuiz() {
-      this.$router.push({
-        name: "play",
-        params: {
-          id: this.id,
-        },
-      });
     },
   },
   mounted() {
@@ -150,16 +132,6 @@ export default {
 </script>
 
 <style lang="scss">
-/* ---------- MODAL ---------- */
-
-.modal {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  z-index: 1;
-}
-
 /* ---------- SLICK SLIDER ---------- */
 
 .slick-slider {
